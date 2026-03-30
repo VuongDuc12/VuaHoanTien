@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html class="dark" lang="vi"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>VuaHoanTien - Luồng hoàn tiền</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00E5FF",
+                        "surface": "#0e0e11",
+                        "surface-container": "#19191d",
+                        "surface-container-high": "#1f1f23",
+                        "surface-container-highest": "#25252a",
+                        "on-surface": "#f0edf1",
+                        "on-surface-variant": "#acaaae",
+                        "outline-variant": "#48474b",
+                        "secondary": "#efc900",
+                        "tertiary": "#2be800",
+                        "error": "#ff716c"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope", "sans-serif"],
+                        "body": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(14, 14, 17, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .obsidian-gradient {
+            background: linear-gradient(135deg, #00E5FF 0%, #0097a7 100%);
+        }
+        .bento-glow {
+            box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        .vault-gradient {
+            background: radial-gradient(circle at top right, rgba(0, 229, 255, 0.15) 0%, transparent 70%);
+        }
+        body {
+            scrollbar-gutter: stable;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0e0e11;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #25252a;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary/30 antialiased">
+<nav class="fixed top-0 w-full z-50 glass-panel border-b border-outline-variant/10">
+<div class="flex justify-between items-center h-16 px-6 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-10">
+<a class="text-2xl font-black text-primary tracking-tighter font-headline" href="index.html">VuaHoanTien</a>
+<div class="hidden md:flex items-center gap-8">
+<a class="font-headline font-bold text-sm tracking-wide text-on-surface-variant hover:text-primary transition-colors" href="voucher.html">Voucher</a>
+<a class="font-headline font-bold text-sm tracking-wide text-primary border-b border-primary pb-1" href="cashback.html">Hoàn tiền</a>
+<a class="font-headline font-bold text-sm tracking-wide text-on-surface-variant hover:text-primary transition-colors" href="wallet.html">Ví</a>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="hidden lg:flex items-center bg-surface-container px-3 py-1.5 rounded-full border border-outline-variant/10 w-64 group focus-within:border-primary/50 transition-all">
+<span class="material-symbols-outlined text-on-surface-variant text-xl">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-on-surface-variant/50 ml-2" placeholder="Dán link cần hoàn tiền..." type="text">
+</div>
+<button class="p-2 rounded-full hover:bg-surface-container-high text-on-surface-variant relative transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-surface"></span>
+</button>
+<div class="h-9 w-9 rounded-full overflow-hidden border border-primary/20 cursor-pointer hover:border-primary transition-colors">
+<img alt="User profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHvj6YGC8LTgaimoM1p-PTz9Kg4gLqtOG2QV8uHJCz59CLnrIlE4XhJ8p9Y0okrWeNjyVSUaNIOf5HKornCDc8XCnr-l1qtdBJ-jssKk0W9x67Gv2wxwFnQTxiQDb7NlXoAd-R0uq8QrIwpCf7VuzYXih9OX0fC9AQ6GGpjqb9NxkZOvDSEuvkp2-7gt1jKiYNEpZDSoXu8LatjLLA2IuPvk1DnYFtsWvJRDRfi6Lz15UON52dv3KgZfcp3cmAL09FDxOcyiyrhKs">
+</div>
+</div>
+</div>
+</nav>
+
+<main class="pt-24 pb-24 px-6 max-w-7xl mx-auto space-y-10">
+<section class="relative overflow-hidden rounded-2xl p-8 md:p-12 bg-surface-container vault-gradient border border-outline-variant/10">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-tertiary/10 text-tertiary text-[10px] font-bold uppercase tracking-widest mb-5 border border-tertiary/20">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">check_circle</span> Luồng xác nhận link đã đồng bộ
+</div>
+<h1 class="font-headline text-4xl md:text-6xl font-extrabold tracking-tight mb-4">Sẵn sàng dẫn người dùng tới bước nhận thưởng</h1>
+<p class="text-on-surface-variant text-lg max-w-3xl">Trang kết quả hoàn tiền bây giờ dùng cùng bộ khung với `index.html`, có điều hướng chéo rõ ràng và dễ demo tiếp sang ví sau khi người dùng xem được mức hoàn tiền dự kiến.</p>
+<div class="mt-8 flex flex-col sm:flex-row gap-3">
+<a class="obsidian-gradient text-[#003840] font-black py-3.5 px-7 rounded-xl active:scale-95 transition-all shadow-lg shadow-primary/20 text-center" href="wallet.html">Qua ví để xem thưởng</a>
+<a class="py-3.5 px-7 rounded-xl border border-outline-variant/20 font-bold text-on-surface hover:bg-surface-container-high transition-colors text-center" href="voucher.html">Quay lại voucher</a>
+</div>
+</section>
+
+<section class="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] gap-8 items-start">
+<aside class="space-y-6 lg:sticky lg:top-24">
+<div class="bg-surface-container rounded-2xl p-6 border border-outline-variant/10 bento-glow">
+<div class="flex items-center justify-between mb-5">
+<h2 class="font-headline font-bold text-lg">Điều hướng app</h2>
+<span class="material-symbols-outlined text-primary">account_tree</span>
+</div>
+<div class="space-y-3 text-sm font-semibold">
+<a class="flex items-center justify-between rounded-xl bg-surface-container-high px-4 py-3 hover:border-primary/30 border border-transparent transition-colors" href="index.html"><span>Trang chủ</span><span class="material-symbols-outlined text-base">home</span></a>
+<a class="flex items-center justify-between rounded-xl bg-surface-container-high px-4 py-3 hover:border-primary/30 border border-transparent transition-colors" href="voucher.html"><span>Ưu đãi</span><span class="material-symbols-outlined text-base">confirmation_number</span></a>
+<a class="flex items-center justify-between rounded-xl bg-primary/10 text-primary px-4 py-3 border border-primary/20" href="cashback.html"><span>Hoàn Tiền</span><span class="material-symbols-outlined text-base">paid</span></a>
+<a class="flex items-center justify-between rounded-xl bg-surface-container-high px-4 py-3 hover:border-primary/30 border border-transparent transition-colors" href="wallet.html"><span>Ví</span><span class="material-symbols-outlined text-base">account_balance_wallet</span></a>
+</div>
+</div>
+
+<div class="bg-surface-container rounded-2xl p-6 border border-outline-variant/10 space-y-5">
+<h3 class="font-headline font-bold text-lg">Checklist nhận cashback</h3>
+<div class="space-y-4 text-sm text-on-surface-variant">
+<div class="flex gap-3"><span class="material-symbols-outlined text-primary">shopping_cart</span><p>Giỏ hàng trống trước khi click link hoàn tiền.</p></div>
+<div class="flex gap-3"><span class="material-symbols-outlined text-primary">visibility</span><p>Không chuyển tab hoặc đóng trình duyệt khi đang mô phỏng thanh toán.</p></div>
+<div class="flex gap-3"><span class="material-symbols-outlined text-primary">timer</span><p>Hoàn tất đơn trong vòng 30 phút để hệ thống ghi nhận đầy đủ.</p></div>
+ </div>
+</div>
+
+<div class="bg-primary/10 rounded-2xl p-6 border border-primary/15">
+<h3 class="font-headline font-bold mb-2">Flow demo đề xuất</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">Bắt đầu tại trang chủ hoặc voucher, mở trang này để cho khách xem mức hoàn tiền, rồi nhấn tiếp sang ví để hoàn tất câu chuyện sản phẩm.</p>
+</div>
+</aside>
+
+<div class="space-y-8">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<section class="md:col-span-7 bg-surface-container rounded-2xl overflow-hidden group border border-outline-variant/10">
+<div class="relative h-64 w-full overflow-hidden">
+<img alt="Product preview" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWp5jKWa9WFct3B_QREc7Vq4jCJLdmMl1R-JMT-3RWgJ4iDIM-vx_tiuXVEfiGqO59vtzXXySUTc6m_K6VbWPlTi7jwE3NDSjq3nD3LH9fxC9WDauViDJnvdrVnlEccgdxt2-l1yRFkxGvIbbebDfG_2e_PpNkW6bsnkqhlaWRw8DFzOPbNShvkTQmnHfSRMecG4OQxmhQXOrW578hBdShJeXu-ovb1_xAzo7nQVc_0eodpnfqn1mxu8wCiGmM35b-8VwMPm4iHjE">
+<div class="absolute top-4 left-4 glass-panel px-3 py-1 rounded-lg border border-outline-variant/15">
+<span class="text-xs font-bold text-primary tracking-tight font-headline">Shopee Mall</span>
+</div>
+</div>
+<div class="p-8">
+<h2 class="text-2xl font-bold font-headline mb-2">Tai nghe không dây Premium Sound X1</h2>
+<div class="flex items-baseline gap-3">
+<span class="text-3xl font-black text-on-surface font-headline">4.250.000đ</span>
+<span class="text-on-surface-variant line-through text-sm italic">5.100.000đ</span>
+</div>
+<div class="mt-6 flex items-center gap-4 pt-6 border-t border-outline-variant/15">
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-surface-container-high flex items-center justify-center">
+<span class="text-[10px] font-bold">4.9</span>
+</div>
+<span class="text-sm text-on-surface-variant">Hơn 1.2k người đã mua qua VuaHoanTien</span>
+</div>
+</div>
+</section>
+
+<div class="md:col-span-5 flex flex-col gap-6">
+<section class="bg-surface-container-highest p-8 rounded-2xl border border-outline-variant/10 relative overflow-hidden flex-1">
+<div class="absolute -top-12 -right-12 w-40 h-40 bg-primary/10 rounded-full blur-3xl"></div>
+<div class="relative z-10">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest block mb-1">Ước tính nhận lại</span>
+<div class="text-5xl font-black text-primary font-headline tracking-tighter mb-4">212.500đ</div>
+<div class="flex flex-wrap items-center gap-2 mb-8">
+<span class="px-2 py-0.5 rounded bg-primary/20 text-primary text-[10px] font-bold">5% CASHBACK</span>
+<span class="text-on-surface-variant text-xs">+ 1.500 xu thưởng</span>
+</div>
+<div class="space-y-4">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-xl">query_builder</span>
+<div>
+<p class="text-sm font-bold text-on-surface">Ghi nhận sau 48h</p>
+<p class="text-xs text-on-surface-variant">Sau khi hoàn tất thanh toán đơn hàng.</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-tertiary text-xl">verified_user</span>
+<div>
+<p class="text-sm font-bold text-on-surface">Tự động đối soát</p>
+<p class="text-xs text-on-surface-variant">Hoàn trả trực tiếp vào ví VuaHoanTien của bạn.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="bg-surface-container rounded-2xl p-6 flex items-center gap-4 border border-outline-variant/10">
+<div class="w-12 h-12 rounded-full bg-on-surface-variant/10 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-on-surface-variant">security</span>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed">Trình theo dõi đang được mô phỏng an toàn. Trong buổi demo, bạn có thể dẫn tiếp người xem sang ví để xem phần thưởng đang chờ ghi nhận.</p>
+</section>
+</div>
+
+<section class="md:col-span-12 mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+<a class="md:col-span-2 obsidian-gradient py-5 px-8 rounded-xl flex items-center justify-center gap-3 active:scale-[0.98] transition-all group shadow-[0_10px_30px_rgba(0,229,255,0.25)]" href="wallet.html">
+<span class="text-[#003840] font-headline font-extrabold text-lg uppercase tracking-tight">Tiếp tục sang ví nhận thưởng</span>
+<span class="material-symbols-outlined text-[#003840] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+<div class="grid grid-cols-2 gap-4">
+<a class="bg-surface-container border border-outline-variant/15 py-5 px-4 rounded-xl flex flex-col items-center justify-center gap-2 hover:bg-surface-container-high transition-colors active:scale-95" href="index.html">
+<span class="material-symbols-outlined text-primary">home</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter text-on-surface">Trang chủ</span>
+</a>
+<a class="bg-surface-container border border-outline-variant/15 py-5 px-4 rounded-xl flex flex-col items-center justify-center gap-2 hover:bg-surface-container-high transition-colors active:scale-95" href="voucher.html">
+<span class="material-symbols-outlined text-on-surface-variant">confirmation_number</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter text-on-surface">Voucher</span>
+</a>
+</div>
+</section>
+</div>
+
+<section class="bg-surface-container rounded-2xl p-8 md:p-10 border border-outline-variant/10">
+<h3 class="text-xl font-headline font-bold mb-6 text-center">Mẹo để luôn nhận được hoàn tiền 100%</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+<div class="text-center">
+<div class="text-3xl font-black text-outline-variant/30 mb-2 font-headline italic">01</div>
+<p class="text-sm font-semibold text-on-surface mb-2">Giỏ hàng trống</p>
+<p class="text-xs text-on-surface-variant">Hãy đảm bảo giỏ hàng đang trống trước khi nhấn nút mô phỏng mua ngay.</p>
+</div>
+<div class="text-center md:border-x border-outline-variant/10 px-4">
+<div class="text-3xl font-black text-outline-variant/30 mb-2 font-headline italic">02</div>
+<p class="text-sm font-semibold text-on-surface mb-2">Không dùng adblock</p>
+<p class="text-xs text-on-surface-variant">Tắt các tiện ích chặn quảng cáo để link theo dõi hoạt động chính xác trong demo.</p>
+</div>
+<div class="text-center">
+<div class="text-3xl font-black text-outline-variant/30 mb-2 font-headline italic">03</div>
+<p class="text-sm font-semibold text-on-surface mb-2">Thanh toán ngay</p>
+<p class="text-xs text-on-surface-variant">Hoàn tất việc mua sắm trong vòng 30 phút sau khi nhấn link.</p>
+</div>
+</div>
+</section>
+</div>
+</section>
+</main>
+
+<footer class="w-full py-20 bg-surface border-t border-outline-variant/10">
+<div class="max-w-7xl mx-auto px-6">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+<div class="md:col-span-1 space-y-6">
+<a class="text-2xl font-black text-primary tracking-tighter font-headline inline-block" href="index.html">VuaHoanTien</a>
+<p class="text-on-surface-variant text-sm leading-relaxed">Bản demo HTML đồng bộ giữa landing, voucher, cashback và ví để khách hàng nhìn thấy trọn vẹn hành trình sử dụng.</p>
+<div class="flex gap-4">
+<a class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors" href="index.html"><span class="material-symbols-outlined text-lg">home</span></a>
+<a class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors" href="wallet.html"><span class="material-symbols-outlined text-lg">account_balance_wallet</span></a>
+</div>
+</div>
+<div class="space-y-6">
+<h5 class="font-headline font-bold text-sm uppercase tracking-widest text-on-surface">Liên kết nhanh</h5>
+<ul class="space-y-4">
+<li><a class="text-sm text-on-surface-variant hover:text-primary transition-colors" href="index.html">Trang chủ</a></li>
+<li><a class="text-sm text-on-surface-variant hover:text-primary transition-colors" href="voucher.html">Trung tâm Voucher</a></li>
+<li><a class="text-sm text-on-surface-variant hover:text-primary transition-colors" href="cashback.html">Luồng Hoàn tiền</a></li>
+<li><a class="text-sm text-on-surface-variant hover:text-primary transition-colors" href="wallet.html">Ví thưởng</a></li>
+</ul>
+</div>
+<div class="space-y-6">
+<h5 class="font-headline font-bold text-sm uppercase tracking-widest text-on-surface">Demo flow</h5>
+<ul class="space-y-4">
+<li><a class="text-sm text-on-surface-variant hover:text-primary transition-colors" href="index.html">Bắt đầu tại landing</a></li>
+<li><a class="text-sm text-on-surface-variant hover:text-primary transition-colors" href="voucher.html">Chọn voucher</a></li>
+<li><a class="text-sm text-on-surface-variant hover:text-primary transition-colors" href="cashback.html">Xác nhận cashback</a></li>
+<li><a class="text-sm text-on-surface-variant hover:text-primary transition-colors" href="wallet.html">Chốt bằng ví thưởng</a></li>
+</ul>
+</div>
+<div class="space-y-6">
+<h5 class="font-headline font-bold text-sm uppercase tracking-widest text-on-surface">Luôn bảo mật</h5>
+<p class="text-xs text-on-surface-variant/70">Các thành phần điều hướng, footer và mobile navigation đều bám theo `index.html` để đảm bảo cảm giác sản phẩm thống nhất.</p>
+<div class="flex gap-2">
+<input class="bg-surface-container border-outline-variant/20 rounded-lg text-xs flex-1 px-4 py-2.5 focus:border-primary/50 focus:ring-0" placeholder="Địa chỉ Email" type="email">
+<button class="bg-primary text-[#003840] p-2.5 rounded-lg"><span class="material-symbols-outlined text-sm">send</span></button>
+</div>
+</div>
+</div>
+<div class="pt-8 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-6">
+<p class="text-xs text-on-surface-variant font-medium">© 2024 VuaHoanTien. Hệ thống demo giao diện đồng bộ cho khách hàng.</p>
+<div class="flex items-center gap-6">
+<span class="text-[10px] font-bold text-on-surface-variant/40 flex items-center gap-1"><span class="material-symbols-outlined text-xs">shield</span> ĐÃ MÃ HÓA</span>
+<span class="text-[10px] font-bold text-on-surface-variant/40 flex items-center gap-1"><span class="material-symbols-outlined text-xs">devices</span> RESPONSIVE READY</span>
+</div>
+</div>
+</div>
+</footer>
+
+<div class="md:hidden fixed bottom-0 w-full glass-panel border-t border-outline-variant/10 px-8 py-4 flex justify-between items-center z-50">
+<a href="index.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-2xl">home</span>
+<span class="text-[9px] font-black uppercase tracking-widest">Trang chủ</span>
+</a>
+<a href="voucher.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-2xl">confirmation_number</span>
+<span class="text-[9px] font-black uppercase tracking-widest">Ưu đãi</span>
+</a>
+<a href="cashback.html" class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">paid</span>
+<span class="text-[9px] font-black uppercase tracking-widest">Hoàn Tiền</span>
+</a>
+<a href="wallet.html" class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-2xl">account_balance_wallet</span>
+<span class="text-[9px] font-black uppercase tracking-widest">Ví</span>
+</a>
+</div>
+</body></html>
